@@ -18,10 +18,10 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	private final File moduleFiles = new File(Filesystem.getDeployDirectory(), "swerve");
 	private final SwerveDrive swerveDrive;
 
+	//maximum velocity
 	public final double DRIVE_SCALE_FACTOR = 0.8;
 
 	public SwerveDriveSubsystem() {
-
 		try {
 			swerveDrive = new SwerveParser(moduleFiles).createSwerveDrive(5);
 		} catch (Exception e) {
@@ -29,10 +29,10 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		}
 	}
 	
-	public Command basicDriveCommand(double translationX, double translationY, double omega) {
+	public Command basicDriveCommand(double translationX, double translationY, double angularVelocity) {
 		return run(() -> {
 			Translation2d scaledInput = SwerveMath.scaleTranslation(new Translation2d(translationX, translationY), DRIVE_SCALE_FACTOR);
-			driveFieldOriented(swerveDrive.swerveController.getRawTargetSpeeds(scaledInput.getX(), scaledInput.getY(), omega));
+			driveFieldOriented(swerveDrive.swerveController.getRawTargetSpeeds(scaledInput.getX(), scaledInput.getY(), angularVelocity));
 		});
 	}
 
