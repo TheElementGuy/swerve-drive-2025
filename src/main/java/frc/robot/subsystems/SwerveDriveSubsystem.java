@@ -29,11 +29,25 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		}
 	}
 	
-	public Command basicDriveCommand(double translationX, double translationY, double angularVelocity) {
-		return run(() -> {
-			Translation2d scaledInput = SwerveMath.scaleTranslation(new Translation2d(translationX, translationY), DRIVE_SCALE_FACTOR);
-			driveFieldOriented(swerveDrive.swerveController.getRawTargetSpeeds(scaledInput.getX(), scaledInput.getY(), angularVelocity));
-		});
+	/**
+	 * Drives oriented to the field
+	 * @param translationX The x-velocity relative to the maximum, from [-1.0, 1.0]
+	 * @param translationY The y-velocity relative to the maximum, from [-1.0, 1.0]
+	 * @param angularVelocity The angular velocity to drive the robot
+	 * @throws IllegalArgumentException if translationX or translationY are out of bounds.
+	 */
+	public void basicDriveCommand(double translationX, double translationY, double angularVelocity) {
+		if ((translationX > 1 || translationX < -1) || (translationY > 1 || translationY < -1)) {
+			throw new IllegalArgumentException("Requested speeds out of bounds.");
+		}
+		if (Math.abs(translationX) < 0.05) {
+			translationX = 0;
+		}
+		if (Math.abs(translationY) < 0.05) {
+			translationY = 0;
+		}
+		Translation2d scaledInput = SwerveMath.scaleTranslation(new Translation2d(translationX, translationY), DRIVE_SCALE_FACTOR);
+		driveFieldOriented(swerveDrive.swerveController.getRawTargetSpeeds(scaledInput.getX(), scaledInput.getY(), angularVelocity));
 	}
 
 	public void driveFieldOriented(ChassisSpeeds velocities) {
